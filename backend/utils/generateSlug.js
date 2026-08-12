@@ -1,6 +1,5 @@
-export const generateSlug = ()=>{
-        return text
-            .toString()
+export const generateSlug = (text)=>{
+        return text.toString()
             .toLowerCase()                        // Convert to lowercase
             .trim()                               // Remove whitespace from both ends
             .replace(/[^a-z0-9\s-]/g, '')         // Remove all non-alphanumeric characters (except spaces/hyphens)

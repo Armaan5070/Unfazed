@@ -13,7 +13,7 @@ export const register = async (req, res) => {
     })
 
     if (existing) {
-        res.status(400).json({ message: "User Already Exists" });
+        return res.status(400).json({ message: "User Already Exists" });
     }
 
     const cleanName = generateSlug(name);
@@ -45,7 +45,7 @@ export const register = async (req, res) => {
     try {
         const userSaved = await newUser.save();
         console.log("User created Successfully");
-        res.status(200).json({ message: "User created successfully" });
+        return res.status(200).json({ message: "User created successfully" });
 
     } catch (error) {
         console.log(error);
@@ -65,23 +65,23 @@ export const login = async (req, res) => {
         })
 
         if (!existingUser) {
-            res.status(401).json({
+            return res.status(401).json({
                 message: "User not found"
             })
         }
         const matchPassword = await bcrypt.compare(password, existingUser.password_hash)
 
-        if (!matchPassword) res.status(402).json({ message: "Bad Credentials" });
+        if (!matchPassword) return res.status(401).json({ message: "Bad Credentials" });
 
         const token = jwt.sign(
-            { userId: existingUser.email },
+            { userId: existingUser._id },
             process.env.JWT_SECRET_KEY,
             {
                 expiresIn: '7h'
             }
         )
 
-        res.status(200).json({
+        return res.status(200).json({
             message: "Logged In Successfully",
             token: token
         })

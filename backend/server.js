@@ -8,14 +8,17 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true,
+}));
 app.use(express.json());
 
 app.get('/',(req,res)=>{
     res.send("Backend API running");
 })
 
-app.use(AuthRoutes);
+app.use('/',AuthRoutes);
 const PORT= process.env.PORT;
 
 connectDB().then(()=>{
