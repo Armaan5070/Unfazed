@@ -11,7 +11,7 @@ export const authMiddleware = async (req,res)=>{
         if(!token){
             res.status(401).json({message:"Authentication token not valid"});
         }
-        const decodedUser = jwt.decode(token,process.env.JWT_SECRET_KEY)
+        const decodedUser = jwt.verify(token,process.env.JWT_SECRET_KEY)
 
         req.user = decodedUser;
 

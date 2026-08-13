@@ -1,9 +1,11 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { connectDB } from "./config/db.js";
+import { connectDB } from "./src/config/db.js";
 
-import AuthRoutes from "./routes/auth.routes.js"
+import AuthRoutes from "./src/routes/auth.routes.js"
+import TherapistRoutes from "./src/routes/therapist.routes.js"
+import { authMiddleware } from "./src/middlewares/auth.middleware.js";
 dotenv.config();
 
 const app = express();
@@ -19,6 +21,7 @@ app.get('/',(req,res)=>{
 })
 
 app.use('/',AuthRoutes);
+app.use('/therapist/',authMiddleware,TherapistRoutes)
 const PORT= process.env.PORT;
 
 connectDB().then(()=>{

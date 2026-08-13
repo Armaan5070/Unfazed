@@ -5,8 +5,8 @@ import { useContext } from 'react';
 import { AuthContext } from '../../context/authContext';
 import { useNavigate, Link } from 'react-router-dom';
 import Popup from '../../components/popup';
+import api from "../../api/axiosInstance";
 
-const backendAPI = import.meta.env.VITE_BACKEND_API;
 export default function Login() {
     const [isPassVisible, setPassVisible] = useState(false);
     const [OpenPop, setOpenPop] = useState(false);
@@ -27,17 +27,9 @@ export default function Login() {
             password: pword
         }
 
-        const res = await fetch(`${backendAPI}/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data),
-            credentials: "include"
+        const res = await api.post('/login',data)
 
-        });
-
-        const rData = await res.json();
+        const rData = res.data;
         if (res.ok) {
             login(rData.token);  
             navigate("/")

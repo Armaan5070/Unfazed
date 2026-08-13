@@ -2,9 +2,9 @@
 import logo from "../../assets/react.svg"
 import { useState } from 'react'
 import PassVisible from '../../components/passVisible'
-import {useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import api from "../../api/axiosInstance"
 
-const backendAPI = import.meta.env.VITE_BACKEND_API;
 export default function Register() {
     const navigate = useNavigate();
 
@@ -28,40 +28,32 @@ export default function Register() {
     const [isConfirmPassVisible, setConfirmPassVisible] = useState(false);
 
     async function handleRegister(e) {
-        e.preventDefault();
-        const form = e.currentTarget;
-        const formData = new FormData(form);
-        const uname = formData.get("username");
-        const mail = formData.get("email");
-        const pword = formData.get("pass");
-        const confirm = formData.get("confirm_pass");
+        try {
 
-        if (pass !== confirm) {
-            alert("Passwords do not match!");
-            return;
-        }
-        const data = {
-            name: uname,
-            email: mail,
-            password: pword
-        }
+            e.preventDefault();
+            const form = e.currentTarget;
+            const formData = new FormData(form);
+            const uname = formData.get("username");
+            const mail = formData.get("email");
+            const pword = formData.get("pass");
+            const confirm = formData.get("confirm_pass");
 
-        const res = await fetch(`${backendAPI}/register`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data),
-            credentials: "include"
+            if (pword !== confirm) {
+                alert("Passwords do not match!");
+                return;
+            }
+            const data = {
+                name: uname,
+                email: mail,
+                password: pword
+            }
 
-        });
+            const res = await api.post('/register', data);
 
-        if (res.ok){
-            
-            alert("Registered");
             navigate("/login");
-        } 
-        else alert("EROOORO");
+        } catch (err) {
+            console.log(err);
+        }
 
     }
 
