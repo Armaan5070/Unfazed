@@ -1,18 +1,18 @@
-import api from "../../../frontend/src/api/axiosInstance";
-import Therapist from "../models/Therapist";
+
+import Therapist from "../models/Therapist.js";
 
 export const getProfile = async (req,res)=>{
     try {
-        const {userId} = req.user.userId;
+        const userId = req.user.userId;
         const userData = await Therapist.findOne({
             _id:userId
-        })
+        }).select("-password_hash -createdAt -updatedAt")
 
         return res.status(202).json(userData);
 
         
     } catch (error) {
-        return res.status(404).json({message:"Not found"})
+        return res.status(401).json({message:"Not found"})
     }
 
     

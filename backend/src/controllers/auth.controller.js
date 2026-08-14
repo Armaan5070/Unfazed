@@ -80,10 +80,12 @@ export const login = async (req, res) => {
                 expiresIn: '7h'
             }
         )
-
+        const existingUserData = existingUser.toObject();
+        delete existingUserData.password_hash
         return res.status(200).json({
             message: "Logged In Successfully",
-            token: token
+            token: token,
+            userData:existingUserData
         })
     } catch (err) {
         console.log(err);

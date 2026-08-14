@@ -1,15 +1,15 @@
 import jwt from "jsonwebtoken"
 
-export const authMiddleware = async (req,res)=>{
+export const authMiddleware = async (req,res,next)=>{
     try{
-        const authHeader = body.headers.authorization
+        const authHeader = req.headers.authorization
         if(!authHeader){
             return res.status(401).json({message:"Authorization Required"});
         }
 
         const token = authHeader.split(" ")[1];
         if(!token){
-            res.status(401).json({message:"Authentication token not valid"});
+            return res.status(401).json({message:"Authentication token not valid"});
         }
         const decodedUser = jwt.verify(token,process.env.JWT_SECRET_KEY)
 
@@ -19,5 +19,6 @@ export const authMiddleware = async (req,res)=>{
 
     }catch(err){
         console.log(err);
+        return res.status(403).json({message:"Invalid Token or expired"});
     }
 }

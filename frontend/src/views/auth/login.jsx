@@ -14,8 +14,8 @@ export default function Login() {
     const { login } = useContext(AuthContext);
     const navigate = useNavigate();
     async function handleLogin(e) {
-
-        e.preventDefault();
+        try {
+             e.preventDefault();
         const form = e.currentTarget;
         const formData = new FormData(form);
 
@@ -30,16 +30,19 @@ export default function Login() {
         const res = await api.post('/login',data)
 
         const rData = res.data;
-        if (res.ok) {
-            login(rData.token);  
-            navigate("/")
-        }
-        else {
 
-            setMessage(rData.message)
-            
+        console.log(rData);
+        console.log(rData.userData);
+        
+            login(rData.token, rData.userData);  
+            navigate("/")
+        
+        } catch (error) {
+             setMessage(rData.message)
             setOpenPop(true);
         }
+       
+
     }
 
     return (

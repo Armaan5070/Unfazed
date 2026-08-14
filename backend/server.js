@@ -11,8 +11,9 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: 'http://localhost:5173', 
   credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 
@@ -20,7 +21,7 @@ app.get('/',(req,res)=>{
     res.send("Backend API running");
 })
 
-app.use('/',AuthRoutes);
+app.use(AuthRoutes);
 app.use('/therapist/',authMiddleware,TherapistRoutes)
 const PORT= process.env.PORT;
 
