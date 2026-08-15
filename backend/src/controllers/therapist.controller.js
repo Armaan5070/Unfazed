@@ -20,7 +20,7 @@ export const getProfile = async (req,res)=>{
 
 export const updateProfile = async (req,res)=>{
     try {
-        const {userId} = req.user.userId;
+        const userId = req.user.userId;
         const data = req.body;
         data.slug = data.slug.toLowerCase().replace(/[^a-z0-9-]/g, '-');
        

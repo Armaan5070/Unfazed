@@ -14,7 +14,18 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         try {
           const res = await api.get('/therapist/profile/me');
-          setUserData(res.data);
+          const uData = res.data;
+
+          setUserData({
+  ...uData,
+  languages: Array.isArray(uData.languages)
+    ? uData.languages.join(", ")
+    : uData.languages || "",
+
+  specializations: Array.isArray(uData.specializations)
+    ? uData.specializations.join(", ")
+    : uData.specializations || "",
+})
           setCurrentUser({ isLoggedIn: true });
         }
         catch (err) {

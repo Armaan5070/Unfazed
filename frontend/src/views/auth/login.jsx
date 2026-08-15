@@ -30,9 +30,6 @@ export default function Login() {
         const res = await api.post('/login',data)
 
         const rData = res.data;
-
-        console.log(rData);
-        console.log(rData.userData);
         
             login(rData.token, rData.userData);  
             navigate("/")
