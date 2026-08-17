@@ -5,7 +5,7 @@ import Switch from "./toggleSwitch";
 import api from "../api/axiosInstance";
 export default function Profile() {
     const { userData, setUserData } = useContext(AuthContext);
-
+    const [isSlugAvailable, setSlugAvailable] = useState(null);
     const [message, SetMessage] = useState("");
     async function saveChanges(e) {
         try {
@@ -28,9 +28,30 @@ export default function Profile() {
         } catch (err) {
             SetMessage(err);
         } finally {
-             console.log(message);
+            console.log(message);
         }
     }
+
+    useEffect(() => {
+        if (!userData.slug) {
+            setSlugAvailable("invalid")
+            return;
+        }
+
+        const timeOut = setTimeout(async () => {
+            const slugResponse = await api.get("therapist/dashboard/slugcheck", {
+                params: {
+                    slug: userData.slug,
+                    _id: userData._id
+                }
+            });
+            const slugAvailable = slugResponse.data.slugAvailable;
+            setSlugAvailable(slugAvailable);
+        }, 500)
+
+        return () => { clearTimeout(timeOut) };
+
+    }, [userData.slug, userData.id]);
 
 
 
@@ -42,6 +63,16 @@ export default function Profile() {
             ...d,
             [name]: value
         }))
+    }
+
+    if (!userData) {
+        return (
+            <>
+                <div>
+                    Login to manage your profile
+                </div>
+            </>
+        )
     }
     return (
         <div className="min-h-screen bg-gray-50 p-6">
@@ -58,7 +89,7 @@ export default function Profile() {
                     </div>
 
                     <Link
-                        to="#profile"
+                        to={`/${userData.slug}`}
                         className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
                     >
                         View Public Profile
@@ -275,6 +306,19 @@ export default function Profile() {
                                             onChange={handleChange}
                                             className="rounded-md border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-gray-500 focus:ring-1 focus:ring-gray-500"
                                         />
+
+                                        <div className="slugInfo text-xs italic">
+                                            {isSlugAvailable === "invalid" && (
+                                                <div className="text-red-500">Invalid slug</div>
+                                            )}
+
+                                            {isSlugAvailable === false && (
+                                                <div className="text-red-500">Slug Not Available.</div>
+                                            )}
+
+                                            {isSlugAvailable === true && (
+                                                <div className="text-green-600">Slug Available.</div>
+                                            )}</div>
                                     </div>
 
                                 </div>

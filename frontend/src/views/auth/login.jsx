@@ -32,7 +32,7 @@ export default function Login() {
         const rData = res.data;
         
             login(rData.token, rData.userData);  
-            navigate("/")
+            navigate("/therapist/dashboard")
         
         } catch (error) {
              setMessage(rData.message)

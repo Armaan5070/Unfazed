@@ -23,8 +23,8 @@ app.get('/',(req,res)=>{
 })
 
 app.use(AuthRoutes);
-app.use('/therapist/',authMiddleware,TherapistRoutes)
 app.use(clientRoutes);
+app.use('/therapist/',authMiddleware,TherapistRoutes)
 const PORT= process.env.PORT;
 
 connectDB().then(()=>{
