@@ -10,7 +10,9 @@ export const userSlug = async (req,res)=>{
             slug:slug
         }).select("-password_hash -createdAt -updatedAt")
 
-       
+       if (!user) {
+      return res.status(404).json({ message: "Profile not found in database" });
+    }
        
         return res.status(200).json({message:"Profile fetched successfull",
             data:user
