@@ -12,13 +12,9 @@ dotenv.config();
 
 const app = express();
 
-const allowedOrigins = [     
-  'http://localhost:5173',     
-  process.env.VERCEL_FRONTEND   
-].filter(Boolean);
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: ['http://localhost:5173', process.env.VERCEL_FRONTEND].filter(Boolean),
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
