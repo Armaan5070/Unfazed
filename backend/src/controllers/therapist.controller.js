@@ -58,8 +58,13 @@ export const slugCheck = async (req, res) => {
             _id: { $ne: _id }
         });
 
-
+        const CurrentUser = await Therapist.findOne({
+            _id:_id
+        })
         if (existingSlug) return res.status(200).json({ slugAvailable: false });
+        else if(!existingSlug&&CurrentUser.slug===slug){
+            return res.status(200).json({slugAvailable:""});
+        }
         return res.status(200).json({ slugAvailable: true });
 
     } catch (error) {

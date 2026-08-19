@@ -33,7 +33,7 @@ export default function Profile() {
     }
 
     useEffect(() => {
-        if (!userData.slug) {
+        if (!userData?.slug) {
             setSlugAvailable("invalid")
             return;
         }
@@ -41,8 +41,8 @@ export default function Profile() {
         const timeOut = setTimeout(async () => {
             const slugResponse = await api.get("therapist/dashboard/slugcheck", {
                 params: {
-                    slug: userData.slug,
-                    _id: userData._id
+                    slug: userData?.slug,
+                    _id: userData?._id
                 }
             });
             const slugAvailable = slugResponse.data.slugAvailable;
@@ -51,7 +51,7 @@ export default function Profile() {
 
         return () => { clearTimeout(timeOut) };
 
-    }, [userData.slug, userData.id]);
+    }, [userData?.slug, userData?.id]);
 
 
 

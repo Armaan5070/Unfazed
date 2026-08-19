@@ -1,11 +1,16 @@
 import { useContext } from "react"
 import { AuthContext } from "../context/authContext"
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+
 export default function Navbar(){
+    const navigate = useNavigate();
     const {userData, logout} = useContext(AuthContext);
     const [menuOpen, setMenuOpen] = useState(false);
-
+    function handleLogout(){
+        logout();
+        navigate("/");
+    }
     return (
         <nav className="px-8 py-5">
             <div className="flex items-center justify-between">
@@ -28,7 +33,7 @@ export default function Navbar(){
                     {userData ? (
                         <div className="flex items-center gap-5">
                             <div>{userData.name}</div>
-                            <button onClick={logout}>Logout</button>
+                            <button onClick={handleLogout}>Logout</button>
                         </div>
                     ) : (
                         <Link to="/login">Login</Link>

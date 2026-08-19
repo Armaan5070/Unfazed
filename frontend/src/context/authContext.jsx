@@ -1,8 +1,10 @@
 import { createContext, useState, useEffect } from "react";
 import api from "../api/axiosInstance";
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  
   const [currentUser, setCurrentUser] = useState({ isLoggedIn: false });
   const [userData, setUserData] = useState(null)
   const [loading, setLoading] = useState(true);

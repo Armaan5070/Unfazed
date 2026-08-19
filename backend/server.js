@@ -7,12 +7,18 @@ import AuthRoutes from "./src/routes/auth.routes.js"
 import clientRoutes from "./src/routes/client.routes.js"
 import TherapistRoutes from "./src/routes/therapist.routes.js"
 import { authMiddleware } from "./src/middlewares/auth.middleware.js";
+dotenv.config({path:'.env.local'})
 dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [     
+  'http://localhost:5173',     
+  process.env.VERCEL_FRONTEND   
+].filter(Boolean);
+
 app.use(cors({
-  origin: 'https://unfazed-rho.vercel.app', 
+  origin: allowedOrigins,
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
