@@ -14,7 +14,7 @@ const app = express();
 
 const allowedOrigins = [     
   'http://localhost:5173',     
-  'https://unfazed-rho.vercel.app'   
+  process.env.VERCEL_FRONTEND  
 ].filter(Boolean);
 
 app.use(cors({
