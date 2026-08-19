@@ -12,9 +12,13 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [     
+  'http://localhost:5173',     
+  'https://unfazed-rho.vercel.app'   
+].filter(Boolean);
 
 app.use(cors({
-  origin: process.env.VERCEL_FRONTEND,
+  origin: allowedOrigins ,
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
