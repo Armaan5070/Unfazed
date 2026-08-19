@@ -18,7 +18,7 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: "https://unfazed-rho.vercel.app",
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
