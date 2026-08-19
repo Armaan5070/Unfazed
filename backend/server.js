@@ -14,7 +14,7 @@ const app = express();
 
 
 app.use(cors({
-  origin: ['http://localhost:5173', process.env.VERCEL_FRONTEND].filter(Boolean),
+  origin: process.env.VERCEL_FRONTEND,
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
