@@ -16,7 +16,7 @@ const vercel =  process.env.VERCEL_FRONTEND
 const allowedOrigins = [     
   'http://localhost:5173',     
   vercel
-].filter(Boolean);
+];
 
 app.use(cors({
   origin: allowedOrigins ,
