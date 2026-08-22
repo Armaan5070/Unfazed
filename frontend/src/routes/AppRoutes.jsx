@@ -4,6 +4,7 @@ import Register from "../views/auth/register";
 import Dashboard from "../views/therapist/dashboard";
 import ClientPortal from "../views/client/clientPortal";
 import Home from "../views/home";
+import Schedule from "../views/therapist/schedule";
 export default function AppRoutes(){
     return (
         <Routes>
@@ -12,6 +13,7 @@ export default function AppRoutes(){
         <Route path="/register" element = {<Register/>}/>
         <Route path="/therapist/dashboard" element = {<Dashboard/>}/>
         <Route path="/:slug" element={<ClientPortal/>}/>
+        <Route path="/therapist/schedule" element = {<Schedule/>}/>
         </Routes>
     )
 }

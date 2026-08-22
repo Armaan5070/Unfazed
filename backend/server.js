@@ -6,6 +6,7 @@ import { connectDB } from "./src/config/db.js";
 import AuthRoutes from "./src/routes/auth.routes.js"
 import clientRoutes from "./src/routes/client.routes.js"
 import TherapistRoutes from "./src/routes/therapist.routes.js"
+import scheduleRoutes from "./src/routes/schedule.routes.js"
 import { authMiddleware } from "./src/middlewares/auth.middleware.js";
 dotenv.config({path:'.env.local'})
 dotenv.config();
@@ -31,6 +32,7 @@ app.get('/',(req,res)=>{
 app.use(AuthRoutes);
 app.use(clientRoutes);
 app.use('/therapist/',authMiddleware,TherapistRoutes)
+app.use("/therapist/",authMiddleware,scheduleRoutes )
 const PORT= process.env.PORT;
 
 connectDB().then(()=>{
