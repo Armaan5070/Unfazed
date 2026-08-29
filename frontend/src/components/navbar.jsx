@@ -20,9 +20,9 @@ export default function Navbar(){
                 {/* Desktop Menu */}
                 <div className="hidden md:block options">
                     <ul className="flex items-center gap-5">
-                        <li>Dashboard</li>
-                        <li>Clients</li>
-                        <li>Schedule</li>
+                        <li><Link to="/therapist/dashboard">Dashboard</Link></li>
+                        <li> Clients</li>
+                        <li><Link to="/therapist/schedule">Schedule</Link></li>
                         <li>Notes</li>
                         <li>Analytics</li>
                     </ul>
