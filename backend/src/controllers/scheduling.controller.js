@@ -1,4 +1,5 @@
 import schedule from "../models/schedule.js";
+import Appointment from "../models/booking.js";
 export const getSchedule = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -32,10 +33,10 @@ export const makeSchedule = async (req, res) => {
             { therapistId: userId },
             { $set: updatedData },
             {
-                returnDocument: "after", // Standard Mongoose option to return the updated document
-                upsert: true, // Create document if it doesn't exist
-                runValidators: true, // Enforce schema validations on update
-                setDefaultsOnInsert: true, // Ensures schema defaults apply if a new doc is created
+                returnDocument: "after",
+                upsert: true,
+                runValidators: true,
+                setDefaultsOnInsert: true,
             }
         );
 
@@ -47,3 +48,4 @@ export const makeSchedule = async (req, res) => {
         return res.status(403).json({ message: error });
     }
 }
+
