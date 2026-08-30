@@ -44,7 +44,7 @@ export const updateProfile = async (req, res) => {
 
         )
 
-        if (updatedUser) return res.status(200).json(updatedUser);
+        if (updatedUser) return res.status(200).json({message:"Saved Changes Successfully"});
     } catch (error) {
         return res.status(400).json({ message: "Cannot update profile" });
     }
