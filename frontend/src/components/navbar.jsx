@@ -55,31 +55,31 @@ export default function Navbar(){
                 <div className="md:hidden mt-5 border-t pt-5">
                     <ul className="flex flex-col gap-4">
                         <li>
-                            <Link to="/dashboard" onClick={() => setMenuOpen(false)}>
+                            <Link to="/therapist/dashboard" onClick={() => setMenuOpen(false)}>
                                 Dashboard
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/clients" onClick={() => setMenuOpen(false)}>
+                            <Link to="/therapist/clients" onClick={() => setMenuOpen(false)}>
                                 Clients
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/schedule" onClick={() => setMenuOpen(false)}>
+                            <Link to="/therapist/schedule" onClick={() => setMenuOpen(false)}>
                                 Schedule
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/notes" onClick={() => setMenuOpen(false)}>
+                            <Link to="/therapist/notes" onClick={() => setMenuOpen(false)}>
                                 Notes
                             </Link>
                         </li>
 
                         <li>
-                            <Link to="/analytics" onClick={() => setMenuOpen(false)}>
+                            <Link to="/therapist/analytics" onClick={() => setMenuOpen(false)}>
                                 Analytics
                             </Link>
                         </li>
