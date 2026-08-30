@@ -4,14 +4,12 @@ import { useState } from 'react';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/authContext';
 import { useNavigate, Link } from 'react-router-dom';
-import Popup from '../../components/popup';
 import api from "../../api/axiosInstance";
-
+import { useToast } from "../../context/toastContext";
 export default function Login() {
     const [isPassVisible, setPassVisible] = useState(false);
-    const [OpenPop, setOpenPop] = useState(false);
-    const [resMessage,setMessage] = useState("")
     const { login } = useContext(AuthContext);
+    const {showToast} = useToast();
     const navigate = useNavigate();
     async function handleLogin(e) {
         try {
@@ -30,13 +28,14 @@ export default function Login() {
         const res = await api.post('/login',data)
 
         const rData = res.data;
-        
+            showToast(rData.message)
             login(rData.token, rData.userData);  
             navigate("/therapist/dashboard")
         
         } catch (error) {
-             setMessage(rData.message)
-            setOpenPop(true);
+             showToast(error.response?.data?.message ||
+        "Something went wrong.",
+        "error")
         }
        
 
@@ -60,12 +59,7 @@ export default function Login() {
                     <p>Not registered? <Link to="/register" className='text-blue-800'>SignUp</Link> here</p>
                 <button type="submit" className="subBut  text-2xl w-[90%]  my-2 rounded-sm p-1 mb-4 bg-emerald-600 text-white">Login</button>
             </form>
-            <Popup
-                Open={OpenPop}
-                onClose={() => { setOpenPop(false);}}
-            >
-                <h1>{resMessage}</h1>
-            </Popup>
+          
         </div>
     )
 }

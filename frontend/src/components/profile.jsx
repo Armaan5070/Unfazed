@@ -3,10 +3,12 @@ import { AuthContext } from "../context/authContext"
 import { Link } from "react-router-dom"
 import Switch from "./toggleSwitch";
 import api from "../api/axiosInstance";
+import { useToast } from "../context/toastContext";
 export default function Profile() {
     const { userData, setUserData } = useContext(AuthContext);
     const [isSlugAvailable, setSlugAvailable] = useState(null);
     const [message, SetMessage] = useState("");
+    const {showToast} = useToast();
     async function saveChanges(e) {
         try {
             e.preventDefault();
@@ -24,11 +26,10 @@ export default function Profile() {
             };
 
             const response = await api.put('/therapist/profile/me', dataToSend)
+            showToast(response.data.message);
             SetMessage(response.data);
         } catch (err) {
-            SetMessage(err);
-        } finally {
-            console.log(message);
+            showToast(err.response?.data?.message|| "Something went wrong")
         }
     }
 

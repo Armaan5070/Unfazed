@@ -4,11 +4,11 @@ import { useState } from 'react'
 import PassVisible from '../../components/passVisible'
 import { useNavigate } from 'react-router-dom'
 import api from "../../api/axiosInstance"
-
+import { useToast } from "../../context/toastContext"
 export default function Register() {
     const navigate = useNavigate();
 
-
+    const {showToast} = useToast();
     const [pass, setPass] = useState("");
     const [confirm_pass, setConfirmPass] = useState("");
 
@@ -49,10 +49,10 @@ export default function Register() {
             }
 
             const res = await api.post('/register', data);
-
+            showToast(res.data.message);
             navigate("/login");
         } catch (err) {
-            console.log(err);
+           showToast(err.response.data.message||"Something Went Wrong!")
         }
 
     }

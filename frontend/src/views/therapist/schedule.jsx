@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Navbar from "../../components/navbar";
 
+
 const days = [
   "monday",
   "tuesday",
@@ -98,7 +99,7 @@ const defaultSchedule = {
 
 export default function Schedule() {
   const [loading, setLoading] = useState(true);
-
+  const [leaveDate, setLeaveDate] = useState("");
   const {
     register,
     handleSubmit,
@@ -158,9 +159,8 @@ export default function Schedule() {
         })),
       };
 
-      console.log("DATA BEFORE REQUEST:", payload);
       const response = await api.put("therapist/schedule", payload);
-      console.log("RESPONSE:", response.data);
+
 
       const savedSchedule = response.data.schedule || response.data;
 
@@ -189,227 +189,282 @@ export default function Schedule() {
   if (loading) {
     return <p className="p-4 text-sm text-zinc-500">Loading schedule...</p>;
   }
+  const currentBlockedDates = watch("blockedDates") || [];
 
   return (
     <>
-    <Navbar/>
-    <div className="max-w-2xl mx-auto my-4 sm:my-8 p-4 sm:p-6 bg-white border border-zinc-200 rounded-xl shadow-sm text-zinc-900 space-y-8">
-      <h1 className="text-xl sm:text-2xl font-semibold tracking-tight border-b border-zinc-200 pb-4">
-        My Schedule
-      </h1>
+      <Navbar />
+      <div className="max-w-2xl mx-auto my-4 sm:my-8 p-4 sm:p-6 bg-white border border-zinc-200 rounded-xl shadow-sm text-zinc-900 space-y-8">
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight border-b border-zinc-200 pb-4">
+          My Schedule
+        </h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        {/* =============================== */}
-        {/* WEEKLY SCHEDULE */}
-        {/* =============================== */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+{/*weeklyschedule*/}
 
-        <section className="space-y-4">
-          <h2 className="text-base font-medium text-zinc-900 border-b border-zinc-100 pb-2">
-            Weekly Schedule
-          </h2>
+          <section className="space-y-4">
+            <h2 className="text-base font-medium text-zinc-900 border-b border-zinc-100 pb-2">
+              Weekly Schedule
+            </h2>
 
-          <div className="space-y-1">
-            {days.map((day, index) => {
-              const enabled = watch(`weeklySchedule[${index}].isWorking`);
+            <div className="space-y-1">
+              {days.map((day, index) => {
+                const enabled = watch(`weeklySchedule[${index}].isWorking`);
 
-              return (
-                <div
-                  key={index}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 py-3 sm:py-2 border-b border-zinc-100 last:border-0"
-                >
-                  {/* HIDDEN INPUT FOR DAY PROPERTY */}
-                  <input
-                    type="hidden"
-                    value={day}
-                    {...register(`weeklySchedule[${index}].day`)}
-                  />
-
-                  <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 min-w-[120px] cursor-pointer">
+                return (
+                  <div
+                    key={index}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-3 py-3 sm:py-2 border-b border-zinc-100 last:border-0"
+                  >
+                    {/* HIDDEN INPUT FOR DAY PROPERTY */}
                     <input
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-zinc-300 accent-black focus:ring-black"
-                      {...register(`weeklySchedule[${index}].isWorking`)}
+                      type="hidden"
+                      value={day}
+                      {...register(`weeklySchedule[${index}].day`)}
                     />
 
-                    {day.charAt(0).toUpperCase() + day.slice(1)}
-                  </label>
+                    <label className="flex items-center gap-2 text-sm font-medium text-zinc-700 min-w-[120px] cursor-pointer">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-zinc-300 accent-black focus:ring-black"
+                        {...register(`weeklySchedule[${index}].isWorking`)}
+                      />
 
-                  <div className="flex items-center gap-2 pl-6 sm:pl-0">
-                    <input
-                      type="time"
-                      disabled={!enabled}
-                      className="w-full sm:w-auto rounded-md border border-zinc-300 px-2.5 py-1.5 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black disabled:bg-zinc-100 disabled:text-zinc-400 disabled:cursor-not-allowed"
-                      {...register(
-                        `weeklySchedule[${index}].slots[0].startTime`
-                      )}
-                    />
+                      {day.charAt(0).toUpperCase() + day.slice(1)}
+                    </label>
 
-                    <span className="text-sm text-zinc-400 font-normal">
-                      to
-                    </span>
+                    <div className="flex items-center gap-2 pl-6 sm:pl-0">
+                      <input
+                        type="time"
+                        disabled={!enabled}
+                        className="w-full sm:w-auto rounded-md border border-zinc-300 px-2.5 py-1.5 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black disabled:bg-zinc-100 disabled:text-zinc-400 disabled:cursor-not-allowed"
+                        {...register(
+                          `weeklySchedule[${index}].slots[0].startTime`
+                        )}
+                      />
 
-                    <input
-                      type="time"
-                      disabled={!enabled}
-                      className="w-full sm:w-auto rounded-md border border-zinc-300 px-2.5 py-1.5 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black disabled:bg-zinc-100 disabled:text-zinc-400 disabled:cursor-not-allowed"
-                      {...register(
-                        `weeklySchedule[${index}].slots[0].endTime`
-                      )}
-                    />
+                      <span className="text-sm text-zinc-400 font-normal">
+                        to
+                      </span>
+
+                      <input
+                        type="time"
+                        disabled={!enabled}
+                        className="w-full sm:w-auto rounded-md border border-zinc-300 px-2.5 py-1.5 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black disabled:bg-zinc-100 disabled:text-zinc-400 disabled:cursor-not-allowed"
+                        {...register(
+                          `weeklySchedule[${index}].slots[0].endTime`
+                        )}
+                      />
+                    </div>
                   </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* APPOINTMENT SETTINGS */}
+         
+
+          <section className="space-y-4">
+            <h2 className="text-base font-medium text-zinc-900 border-b border-zinc-100 pb-2">
+              Appointment Settings
+            </h2>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label
+                  htmlFor="sessionDuration"
+                  className="block text-xs font-medium text-zinc-600 mb-1.5"
+                >
+                  Session Duration
+                </label>
+
+                <select
+                  id="sessionDuration"
+                  className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+                  {...register("sessionDurationMinutes", {
+                    valueAsNumber: true,
+                  })}
+                >
+                  <option value={30}>30 minutes</option>
+                  <option value={45}>45 minutes</option>
+                  <option value={60}>60 minutes</option>
+                  <option value={90}>90 minutes</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="bufferTime"
+                  className="block text-xs font-medium text-zinc-600 mb-1.5"
+                >
+                  Buffer Time
+                </label>
+
+                <select
+                  id="bufferTime"
+                  className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+                  {...register("bufferTimeMinutes", {
+                    valueAsNumber: true,
+                  })}
+                >
+                  <option value={0}>No buffer</option>
+                  <option value={5}>5 minutes</option>
+                  <option value={10}>10 minutes</option>
+                  <option value={15}>15 minutes</option>
+                  <option value={30}>30 minutes</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="minimumAdvanceTime"
+                  className="block text-xs font-medium text-zinc-600 mb-1.5"
+                >
+                  Minimum Advance Notice
+                </label>
+
+                <select
+                  id="minimumAdvanceTime"
+                  className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+                  {...register("minimumAdvanceTime", {
+                    valueAsNumber: true,
+                  })}
+                >
+                  <option value={0}>No minimum</option>
+                  <option value={30}>30 minutes</option>
+                  <option value={60}>1 hour</option>
+                  <option value={120}>2 hours</option>
+                  <option value={1440}>24 hours</option>
+                  <option value={2880}>48 hours</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          {/* TIMEZONE */}
+
+          <section className="space-y-4">
+            <h2 className="text-base font-medium text-zinc-900 border-b border-zinc-100 pb-2">
+              Timezone
+            </h2>
+
+            <div>
+              <input
+                type="text"
+                className="w-full sm:w-80 rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+                {...register("timeZone")}
+              />
+            </div>
+          </section>
+
+
+
+          <section className="space-y-3">
+            <h2 className="text-base font-medium text-zinc-900 border-b border-zinc-100 pb-2">
+              Days Off / Leave
+            </h2>
+
+            <p className="text-xs text-zinc-500">
+              Select the dates you want to mark as leave.
+            </p>
+
+            <div className="flex items-end gap-2">
+              <div className="flex-1">
+                <label
+                  htmlFor="leaveDate"
+                  className="block text-xs font-medium text-zinc-700 mb-1"
+                >
+                  Leave date
+                </label>
+
+                <input
+                  id="leaveDate"
+                  type="date"
+                  value={leaveDate}
+                  onChange={(e) => setLeaveDate(e.target.value)}
+                  className="w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-zinc-400 focus:ring-1 focus:ring-zinc-300"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (!leaveDate) return;
+
+                  const currentDates = watch("blockedDates") || [];
+
+                  if (currentDates.includes(leaveDate)) return;
+
+                  setValue("blockedDates", [...currentDates, leaveDate], {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  });
+
+                  setLeaveDate("");
+                }}
+                disabled={!leaveDate}
+                className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Add
+              </button>
+            </div>
+
+            {watch("blockedDates")?.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-zinc-700">
+                  Selected leave dates
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {watch("blockedDates").map((date) => (
+                    <div
+                      key={date}
+                      className="flex items-center gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-sm text-zinc-700"
+                    >
+                      <span>{date}</span>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentDates = watch("blockedDates") || [];
+
+                          setValue(
+                            "blockedDates",
+                            currentDates.filter((item) => item !== date),
+                            {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            }
+                          );
+                        }}
+                        className="text-zinc-400 hover:text-red-500"
+                        aria-label={`Remove ${date}`}
+                      >
+                        
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              );
-            })}
+              </div>
+            )}
+
+          </section>
+
+
+
+
+          <div className="pt-4 border-t border-zinc-100">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto px-5 py-2.5 bg-black text-white text-sm font-medium rounded-md hover:bg-zinc-800 disabled:opacity-50 transition-colors cursor-pointer"
+            >
+              {isSubmitting ? "Saving..." : "Save Schedule"}
+            </button>
           </div>
-        </section>
-
-        {/* =============================== */}
-        {/* APPOINTMENT SETTINGS */}
-        {/* =============================== */}
-
-        <section className="space-y-4">
-          <h2 className="text-base font-medium text-zinc-900 border-b border-zinc-100 pb-2">
-            Appointment Settings
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label
-                htmlFor="sessionDuration"
-                className="block text-xs font-medium text-zinc-600 mb-1.5"
-              >
-                Session Duration
-              </label>
-
-              <select
-                id="sessionDuration"
-                className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                {...register("sessionDurationMinutes", {
-                  valueAsNumber: true,
-                })}
-              >
-                <option value={30}>30 minutes</option>
-                <option value={45}>45 minutes</option>
-                <option value={60}>60 minutes</option>
-                <option value={90}>90 minutes</option>
-              </select>
-            </div>
-
-            <div>
-              <label
-                htmlFor="bufferTime"
-                className="block text-xs font-medium text-zinc-600 mb-1.5"
-              >
-                Buffer Time
-              </label>
-
-              <select
-                id="bufferTime"
-                className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                {...register("bufferTimeMinutes", {
-                  valueAsNumber: true,
-                })}
-              >
-                <option value={0}>No buffer</option>
-                <option value={5}>5 minutes</option>
-                <option value={10}>10 minutes</option>
-                <option value={15}>15 minutes</option>
-                <option value={30}>30 minutes</option>
-              </select>
-            </div>
-
-            <div>
-              <label
-                htmlFor="minimumAdvanceTime"
-                className="block text-xs font-medium text-zinc-600 mb-1.5"
-              >
-                Minimum Advance Notice
-              </label>
-
-              <select
-                id="minimumAdvanceTime"
-                className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-                {...register("minimumAdvanceTime", {
-                  valueAsNumber: true,
-                })}
-              >
-                <option value={0}>No minimum</option>
-                <option value={30}>30 minutes</option>
-                <option value={60}>1 hour</option>
-                <option value={120}>2 hours</option>
-                <option value={1440}>24 hours</option>
-                <option value={2880}>48 hours</option>
-              </select>
-            </div>
-          </div>
-        </section>
-
-        {/* =============================== */}
-        {/* TIMEZONE */}
-        {/* =============================== */}
-
-        <section className="space-y-4">
-          <h2 className="text-base font-medium text-zinc-900 border-b border-zinc-100 pb-2">
-            Timezone
-          </h2>
-
-          <div>
-            <input
-              type="text"
-              className="w-full sm:w-80 rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-              {...register("timeZone")}
-            />
-          </div>
-        </section>
-
-        {/* =============================== */}
-        {/* LEAVES */}
-        {/* =============================== */}
-
-        <section className="space-y-3">
-          <h2 className="text-base font-medium text-zinc-900 border-b border-zinc-100 pb-2">
-            Days Off / Leave
-          </h2>
-
-          <p className="text-xs text-zinc-500">
-            Calendar will update the "leaves" field in React Hook Form.
-          </p>
-
-          <button
-            type="button"
-            onClick={() => {
-              const currentLeaves = watch("blockedDates") || [];
-
-              setValue("blockedDates", [
-                ...currentLeaves,
-                "2026-08-25",
-              ]);
-            }}
-            className="px-3 py-1.5 text-xs font-medium border border-zinc-300 rounded-md bg-white text-zinc-700 hover:bg-zinc-50 transition-colors"
-          >
-            Add Test Leave
-          </button>
-
-          <pre className="p-3 bg-zinc-50 border border-zinc-200 rounded-md text-xs font-mono text-zinc-700 overflow-x-auto">
-            {JSON.stringify(watch("blockedDates"), null, 2)}
-          </pre>
-        </section>
-
-        {/* =============================== */}
-        {/* SUBMIT */}
-        {/* =============================== */}
-
-        <div className="pt-4 border-t border-zinc-100">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full sm:w-auto px-5 py-2.5 bg-black text-white text-sm font-medium rounded-md hover:bg-zinc-800 disabled:opacity-50 transition-colors cursor-pointer"
-          >
-            {isSubmitting ? "Saving..." : "Save Schedule"}
-          </button>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
     </>
   );
 
