@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const appointment = new mongoose.Schema({
-    therapistId: { type: mongoose.Schema.Types.ObjectId, ref: 'Therapist', required: true, unique: true },
+    therapistId: { type: mongoose.Schema.Types.ObjectId, ref: 'Therapist', required: true },
     
     clientName: {
         type: String,
@@ -20,11 +20,10 @@ const appointment = new mongoose.Schema({
         trim: true
     },
 
-    // 3. Exact Slot Timings (Stored in UTC)
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
 
-    // 4. Appointment Status Pipeline
+
     status: {
         type: String,
         enum: ['pending', 'confirmed', 'completed', 'cancelled'],
