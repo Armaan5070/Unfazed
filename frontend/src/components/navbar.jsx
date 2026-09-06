@@ -21,7 +21,7 @@ export default function Navbar(){
                 <div className="hidden md:block options">
                     <ul className="flex items-center gap-5">
                         <li><Link to="/therapist/dashboard">Dashboard</Link></li>
-                        <li> Clients</li>
+                        <li> <Link to="/therapist/clients">Clients</Link></li>
                         <li><Link to="/therapist/schedule">Schedule</Link></li>
                         <li>Notes</li>
                         <li>Analytics</li>

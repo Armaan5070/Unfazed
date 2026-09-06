@@ -6,17 +6,14 @@ import App from './App.jsx'
 import { AuthProvider } from './context/authContext.jsx'
 import { ToastProvider } from './context/toastContext.jsx'
 
-
-
 createRoot(document.getElementById('root')).render(
   <AuthProvider>
   <BrowserRouter>
   <StrictMode>
     <ToastProvider>
-
     <App />
     </ToastProvider>
-  </StrictMode>,
+  </StrictMode>
    </BrowserRouter>
     </AuthProvider>
 )

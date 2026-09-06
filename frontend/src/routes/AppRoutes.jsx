@@ -7,6 +7,8 @@ import Home from "../views/home";
 import Schedule from "../views/therapist/schedule";
 import BookingSchedule from "../components/bookingSchedule";
 import BookingConfirmation from "../components/confirmBooking";
+import Clients from "../views/therapist/client";
+import ClientProfile from "../views/therapist/clientProfile";
 export default function AppRoutes(){
     return (
         <Routes>
@@ -18,6 +20,8 @@ export default function AppRoutes(){
         <Route path="/therapist/schedule" element = {<Schedule/>}/>
         <Route path="/:slug/book" element = {<BookingSchedule/>}/>
         <Route path="/booking/confirmation" element = {<BookingConfirmation/>}/>
+        <Route path="/therapist/clients" element={<Clients/>}/>
+        <Route path="/therapist/clients/:clientId" element={<ClientProfile/>}/>
         </Routes>
     )
 }

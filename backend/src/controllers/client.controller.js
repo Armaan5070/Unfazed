@@ -2,6 +2,8 @@ import { fromZonedTime } from "date-fns-tz";
 import Therapist from "../models/Therapist.js";
 import schedule from "../models/schedule.js";
 import Appointment from "../models/booking.js";
+import client from "../models/client.js";
+import Intake from "../models/intake.js"
 export const userSlug = async (req, res) => {
     try {
 
@@ -50,13 +52,13 @@ export const getAvailableSchedule = async (req, res) => {
                 message: "Schedule not found"
             });
         }
-const isBlocked = tpSchedule.blockedDates.some(
-    d => d.toISOString().split("T")[0] === date
-);
+        const isBlocked = tpSchedule.blockedDates.some(
+            d => d.toISOString().split("T")[0] === date
+        );
 
-if (isBlocked) {
-    return res.status(200).json([]);
-}
+        if (isBlocked) {
+            return res.status(200).json([]);
+        }
 
         const formattedDate = new Date(`${date}T12:00:00Z`);
 
@@ -83,7 +85,7 @@ if (isBlocked) {
 
         const allSlots = [];
 
-       //fromZonedTime converts to utc 
+        //fromZonedTime converts to utc 
 
         for (const slot of daySchedule.slots) {
 
@@ -161,7 +163,39 @@ if (isBlocked) {
 };
 
 
+export const checkClient = async (req, res) => {
+    try {
+        const { slug, email } = req.query;
 
+        if (!slug || !email) {
+            return res.status(400).json({
+                message: "Slug and email are required."
+            });
+        }
+
+        const therapist = await Therapist.findOne({ slug });
+
+        if (!therapist) {
+            return res.status(404).json({
+                message: "Therapist not found."
+            });
+        }
+
+        const existingClient = await client.findOne({
+            therapistId: therapist._id,
+            email: email.toLowerCase().trim()
+        });
+
+        return res.status(200).json({
+            exists: !!existingClient
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Something went wrong."
+        });
+    }
+}
 
 
 export const bookAppointment = async (req, res) => {
@@ -170,31 +204,90 @@ export const bookAppointment = async (req, res) => {
             slug,
             startTime,
             endTime,
-            clientName,
-            clientEmail,
-            clientPhone,
+            bookingFor,
+            clientData,
+            bookerData
         } = req.body;
-        if (
-            !slug ||
-            !startTime ||
-            !endTime ||
-            !clientName ||
-            !clientEmail ||
-            !clientPhone
-        ) {
+
+        // Basic validation
+        if (!slug || !startTime || !endTime || !clientData || !bookingFor) {
             return res.status(400).json({
-                message: "All fields are required.",
+                message: "Required booking information is missing."
             });
         }
 
+        const {
+            name,
+            email,
+            phone,
+
+            // Intake data
+            dateOfBirth,
+            gender,
+            address,
+            presentingConcern,
+            goalsForTherapy,
+            previousTherapy,
+            relevantHistory,
+            emergencyContact,
+
+            consentAccepted
+        } = clientData;
+
+        // Required fields
+        if (!name || !email || !phone) {
+            return res.status(400).json({
+                message: "Name, email and phone of client are required."
+            });
+        }
+
+        if (!consentAccepted) {
+            return res.status(400).json({
+                message: "You must accept the agreement before booking."
+            });
+        }
+        let finalBookerData;
+        if (bookingFor === "myself") {
+            finalBookerData = {
+                name: name.trim(),
+                email: email.toLowerCase().trim(),
+                phone: phone.trim()
+            };
+        }
+        else if (bookingFor === "someoneElse") {
+
+            if (
+                !bookerData ||
+                !bookerData.name ||
+                !bookerData.email ||
+                !bookerData.phone
+            ) {
+                return res.status(400).json({
+                    message: "Booker name, email and phone are required."
+                });
+            }
+
+            finalBookerData = {
+                name: bookerData.name.trim(),
+                email: bookerData.email.toLowerCase().trim(),
+                phone: bookerData.phone.trim()
+            };
+        }
+        else {
+            return res.status(400).json({
+                message: "Invalid booking type."
+            });
+        }
+        // Find therapist
         const therapist = await Therapist.findOne({ slug });
 
         if (!therapist) {
             return res.status(404).json({
-                message: "Therapist not found.",
+                message: "Therapist not found."
             });
         }
 
+        // Validate appointment time
         const start = new Date(startTime);
         const end = new Date(endTime);
 
@@ -203,65 +296,114 @@ export const bookAppointment = async (req, res) => {
             Number.isNaN(end.getTime())
         ) {
             return res.status(400).json({
-                message: "Invalid appointment time.",
+                message: "Invalid appointment time."
             });
         }
 
         if (end <= start) {
             return res.status(400).json({
-                message: "Invalid appointment duration.",
+                message: "Invalid appointment duration."
             });
         }
 
+        // Check whether slot is already booked
         const existingAppointment = await Appointment.findOne({
             therapistId: therapist._id,
 
             status: {
-                $in: ["pending", "confirmed"],
+                $in: ["pending", "confirmed"]
             },
 
             startTime: {
-                $lt: end,
+                $lt: end
             },
 
             endTime: {
-                $gt: start,
-            },
+                $gt: start
+            }
         });
 
         if (existingAppointment) {
             return res.status(409).json({
-                message: "This appointment slot is no longer available.",
+                message: "This appointment slot is no longer available."
             });
         }
 
+        // Find client using therapist + email
+        let existingClient = await client.findOne({
+            therapistId: therapist._id,
+            email: email.toLowerCase().trim()
+        });
+
+        let isNewClient = false;
+
+        // =========================
+        // NEW CLIENT
+        // =========================
+
+        if (!existingClient) {
+
+            isNewClient = true;
+
+            // Create client
+            existingClient = await client.create({
+                therapistId: therapist._id,
+                name: name.trim(),
+                email: email.toLowerCase().trim(),
+                phone: phone.trim()
+            });
+
+            // Create initial intake
+            await Intake.create({
+                clientId: existingClient._id,
+                therapistId: therapist._id,
+
+                dateOfBirth,
+                gender,
+                address,
+
+                presentingConcern,
+                goalsForTherapy,
+                previousTherapy,
+                relevantHistory,
+
+                emergencyContact,
+
+                consent: {
+                    accepted: true,
+                    acceptedAt: new Date()
+                }
+            });
+        }
+
+        // =========================
+        // CREATE APPOINTMENT
+        // =========================
 
         const appointment = await Appointment.create({
             therapistId: therapist._id,
-
-            clientName,
-            clientEmail,
-            clientPhone,
-
+            clientId: existingClient._id,
+             bookedBy: finalBookerData,
             startTime: start,
             endTime: end,
-
-            // Explicitly pending
-            status: "pending",
+            status: "pending"
         });
 
         return res.status(201).json({
             message: "Appointment created successfully.",
             appointment,
+            isNewClient
         });
 
     } catch (error) {
+
         console.error("Book appointment error:", error);
 
         return res.status(500).json({
-            message: "Something went wrong while booking the appointment.",
+            message: "Something went wrong while booking the appointment."
         });
     }
+
+
 };
 
-export default bookAppointment;
