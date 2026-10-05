@@ -145,44 +145,93 @@ export default function BookingConfirmation() {
             }
         }
     };
+    const handlePayment = async (appointmentId) => {
+        try {
+            // 1. Ask backend to create Razorpay order
+            const response = await api.post("/create-order", {
+                appointmentId
+            });
 
+            const {
+                orderId,
+                amount,
+                currency
+            } = response.data;  
+
+            // 2. Razorpay checkout configuration
+            const options = {
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+
+                amount: amount * 100,
+                currency: currency,
+
+                name: "Unfazed",
+                description: "Therapy Session",
+
+                order_id: orderId,
+
+                handler: async function (paymentResponse) {
+                    try {
+                        const response = await api.post("verify-payment", {
+                            razorpay_order_id: paymentResponse.razorpay_order_id,
+                            razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                            razorpay_signature: paymentResponse.razorpay_signature
+                        });
+
+                        console.log(response.data);
+
+                    } catch (error) {
+                        console.error("Payment verification failed:", error);
+                    }
+                },
+
+                theme: {
+                    color: "#000000"
+                }
+            };
+
+            // 3. Open Razorpay
+            const razorpay = new window.Razorpay(options);
+
+            razorpay.open();
+
+        } catch (error) {
+            console.error("Payment error:", error);
+        }
+    };
     const handleFinalBooking = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
 
-    try {
-        setLoading(true);
-        setError("");
+        try {
+            setLoading(true);
+            setError("");
 
-        const response = await api.post("/appointments/book", {
-            slug,
-            startTime,
-            endTime,
-            bookingFor,
-            clientData,
-            bookerData
-        });
+            const response = await api.post("/appointments/book", {
+                slug,
+                startTime,
+                endTime,
+                bookingFor,
+                clientData,
+                bookerData
+            });
 
-        showToast(response.data.message);
+            showToast(response.data.message);
 
-        // navigate("/booking/success", {
-        //     state: {
-        //         appointment: response.data.appointment
-        //     }
-        // });
+            handlePayment(response.data.appointment._id);
 
-    } catch (err) {
+        } catch (err) {
 
-        const message =
-            err.response?.data?.message ||
-            "Could not complete the booking.";
+            const message =
+                err.response?.data?.message ||
+                "Could not complete the booking.";
 
-        showToast(message, "error");
-        setError(message);
+            showToast(message, "error");
+            setError(message);
 
-    } finally {
-        setLoading(false);
-    }
-};
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-10 text-gray-900">

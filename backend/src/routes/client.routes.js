@@ -3,8 +3,8 @@ import {getAvailableSchedule, bookAppointment, userSlug, checkClient } from "../
 
 const router = express.Router();
 
-router.get("/:slug",userSlug);
-router.get("/:slug/available",getAvailableSchedule);
 router.get("/appointments/check-client/", checkClient)
 router.post("/appointments/book",bookAppointment);
+router.get("/client/:slug/available",getAvailableSchedule);
+router.get("/client/:slug",userSlug);
 export default router;

@@ -25,7 +25,7 @@ export default function BookingSchedule() {
                 setSelectedSlot(null);
 
                 const response = await api.get(
-                    `${slug}/available?date=${selectedDate}`
+                    `client/${slug}/available?date=${selectedDate}`
                 );
 
                 setAvailableSlots(response.data);

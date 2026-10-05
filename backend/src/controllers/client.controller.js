@@ -14,7 +14,7 @@ export const userSlug = async (req, res) => {
             slug: slug
         }).select("-password_hash -createdAt -updatedAt")
 
-        if (!user) {
+        if (!user) {    
             return res.status(404).json({ message: "Profile not found in database" });
         }
 
@@ -383,7 +383,7 @@ export const bookAppointment = async (req, res) => {
         const appointment = await Appointment.create({
             therapistId: therapist._id,
             clientId: existingClient._id,
-             bookedBy: finalBookerData,
+            bookedBy: finalBookerData,
             startTime: start,
             endTime: end,
             status: "pending"

@@ -16,7 +16,7 @@ export default function ClientPortal() {
             try {
                 setLoading(true);
 
-                const response = await api.get(`${slug}`);
+                const response = await api.get(`client/${slug}`);
 
                 setPhysio(response.data.data);
             } catch (error) {
